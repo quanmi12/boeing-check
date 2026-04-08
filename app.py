@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import requests, os, json
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -12,20 +12,13 @@ if not os.path.exists(DATA_FOLDER):
 USER = "hung1"
 URL = "https://boeingvip.xyz/gambler/user/child/statistic"
 
-# ===== TIMEZONE VN =====
 def get_vn_time():
     return datetime.utcnow() + timedelta(hours=7)
 
-# ===== FETCH DATA =====
-def fetch_data():
-    now_vn = get_vn_time()
-
-    # đầu tháng VN
-    start_vn = datetime(now_vn.year, now_vn.month, 1)
-
-    # convert sang UTC để gọi API
+# ===== FETCH DATA THEO NGÀY =====
+def fetch_data(start_vn, end_vn):
     start_utc = start_vn - timedelta(hours=7)
-    end_utc = now_vn - timedelta(hours=7)
+    end_utc = end_vn - timedelta(hours=7)
 
     payload = {
         "shopId": None,
@@ -54,7 +47,6 @@ def fetch_data():
 
     for item in data.get("data", []):
         game = item.get("gameName", "Unknown")
-
         price = float(str(item.get("price", "0")).replace("$", "").replace(",", ""))
         count = int(item.get("count", 0))
 
@@ -66,10 +58,8 @@ def fetch_data():
 
     return result, total, data.get("data", [])
 
-# ===== SAVE TODAY =====
-def save_today(items, total):
-    today = get_vn_time().date()
-    today_file = os.path.join(DATA_FOLDER, f"{today}.json")
+def save_today(items, total, date):
+    today_file = os.path.join(DATA_FOLDER, f"{date}.json")
 
     with open(today_file, "w", encoding="utf-8") as f:
         json.dump({
@@ -77,38 +67,44 @@ def save_today(items, total):
             "total": total
         }, f, ensure_ascii=False, indent=2)
 
-# ===== LOAD HISTORY =====
 def load_history():
     history = {}
-
     for file in os.listdir(DATA_FOLDER):
         if file.endswith(".json"):
             path = os.path.join(DATA_FOLDER, file)
-
             with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
-
                 total = data.get("total", 0)
                 day = file.replace(".json", "")
-
                 history[day] = total
-
     return dict(sorted(history.items()))
 
-# ===== ROUTE =====
 @app.route("/")
 def index():
-    result, total_today, items = fetch_data()
-    save_today(items, total_today)
+    date_str = request.args.get("date")
+
+    if date_str:
+        # chọn ngày
+        selected_date = datetime.strptime(date_str, "%Y-%m-%d")
+    else:
+        selected_date = get_vn_time()
+
+    # 00:00 → 23:59 của ngày đó
+    start_vn = datetime(selected_date.year, selected_date.month, selected_date.day)
+    end_vn = start_vn + timedelta(days=1)
+
+    result, total_today, items = fetch_data(start_vn, end_vn)
+
+    save_today(items, total_today, start_vn.date())
     history = load_history()
 
     return render_template(
         "index.html",
         result=result,
         total=total_today,
-        history=history
+        history=history,
+        selected_date=start_vn.strftime("%Y-%m-%d")
     )
 
-# ===== RUN =====
 if __name__ == "__main__":
     app.run(debug=True)
