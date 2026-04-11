@@ -33,23 +33,23 @@
             background: rgba(15,23,42,0.7);
             border: 1px solid rgba(56,189,248,0.3);
             border-radius: 15px;
-            padding: 15px;
             margin-bottom: 15px;
+            overflow: hidden;
         }
 
         .row {
             display: flex;
             justify-content: space-between;
+            padding: 12px 15px;
+        }
+
+        .row:hover {
+            background: rgba(255,255,255,0.03);
         }
 
         .price {
             color: #22c55e;
             font-weight: bold;
-        }
-
-        .count {
-            color: #94a3b8;
-            font-size: 14px;
         }
 
         .money {
@@ -61,17 +61,27 @@
         button {
             background: #38bdf8;
             border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
+            padding: 10px 16px;
+            border-radius: 8px;
             cursor: pointer;
             color: black;
+            font-weight: bold;
         }
 
         input, select {
-            padding: 5px;
-            border-radius: 5px;
+            padding: 10px 14px;
+            border-radius: 8px;
             border: none;
             margin-right: 5px;
+            font-size: 15px;
+        }
+
+        .list {
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .item {
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
     </style>
 </head>
@@ -101,45 +111,30 @@
     <!-- GAME -->
     <h2>🎮 GAME</h2>
 
-    {% for game, d in result.items() %}
     <div class="card">
 
         <!-- HEADER -->
-        <div class="row" onclick="toggleDetail('game{{ loop.index }}')" style="cursor:pointer;">
-            <div><b>{{ game }}</b></div>
-            <div class="price">${{ "%.2f"|format(d["price"]) }}</div>
+        <div class="row">
+            <div><b>🎮 Game A</b></div>
+            <div class="price">${{ "%.2f"|format(total or 0) }}</div>
         </div>
 
-        <!-- BUTTON -->
-        <div style="margin-top:10px;">
-            <button onclick="toggleDetail('game{{ loop.index }}')">
-                Xem chi tiết
-            </button>
-        </div>
-
-        <!-- DETAIL -->
-        <div id="game{{ loop.index }}" style="display:none; margin-top:10px;">
-            <div class="count">Số lần: {{ d["count"] }}</div>
-            <div class="count">Tổng tiền: ${{ "%.2f"|format(d["price"]) }}</div>
+        <!-- LIST -->
+        <div class="list">
+            {% for game, money in result.items() %}
+            <div class="row item">
+                <div>{{ game }}</div>
+                <div class="price">${{ "%.2f"|format(money) }}</div>
+            </div>
+            {% endfor %}
         </div>
 
     </div>
-    {% endfor %}
 
 </div>
 
-<!-- JS -->
+<!-- AUTO RELOAD -->
 <script>
-function toggleDetail(id) {
-    const el = document.getElementById(id);
-    if (el.style.display === "none") {
-        el.style.display = "block";
-    } else {
-        el.style.display = "none";
-    }
-}
-
-// auto reload
 setInterval(() => {
     window.location.reload();
 }, 10000);
