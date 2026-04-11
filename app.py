@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request
 import requests, os, json
 from collections import defaultdict
@@ -17,68 +16,95 @@ URL = "https://boeingvip.xyz/gambler/user/child/statistic"
 def get_vn_time():
     return datetime.utcnow() + timedelta(hours=7)
 
-# ===== FETCH DATA =====
+# ===== FETCH DATA (FIX CHỐNG LỖI) =====
 def fetch_data(start_vn, end_vn):
-    start_utc = start_vn - timedelta(hours=7)
-    end_utc = end_vn - timedelta(hours=7)
+    try:
+        start_utc = start_vn - timedelta(hours=7)
+        end_utc = end_vn - timedelta(hours=7)
 
-    payload = {
-        "shopId": None,
-        "packageName": "",
-        "assigned": USER,
-        "productId": "",
-        "action": "import_token",
-        "startDate": start_utc.isoformat() + "Z",
-        "endDate": end_utc.isoformat() + "Z"
-    }
+        payload = {
+            "shopId": None,
+            "packageName": "",
+            "assigned": USER,
+            "productId": "",
+            "action": "import_token",
+            "startDate": start_utc.isoformat() + "Z",
+            "endDate": end_utc.isoformat() + "Z"
+        }
 
-    headers = {
-        "Accept": "application/json, text/plain, */*",
-        "Content-Type": "application/json",
-        "Origin": "https://boeingvip.xyz",
-        "Referer": f"https://boeingvip.xyz/thong-ke-nap?user={USER}",
-        "User-Agent": "Mozilla/5.0",
-        "X-Requested-With": "XMLHttpRequest"
-    }
+        headers = {
+            "Accept": "application/json, text/plain, */*",
+            "Content-Type": "application/json",
+            "Origin": "https://boeingvip.xyz",
+            "Referer": f"https://boeingvip.xyz/thong-ke-nap?user={USER}",
+            "User-Agent": "Mozilla/5.0",
+            "X-Requested-With": "XMLHttpRequest"
+        }
 
-    r = requests.post(URL, json=payload, headers=headers)
-    data = r.json()
+        r = requests.post(URL, json=payload, headers=headers, timeout=10)
 
-    result = defaultdict(lambda: {"price": 0, "count": 0})
-    total = 0
+        # ❗ check lỗi HTTP
+        if r.status_code != 200:
+            print("API ERROR:", r.text)
+            return {}, 0, []
 
-    for item in data.get("data", []):
-        game = item.get("gameName", "Unknown")
+        # ❗ tránh crash json
+        try:
+            data = r.json()
+        except:
+            print("NOT JSON:", r.text)
+            return {}, 0, []
 
-        price = float(str(item.get("price", "0")).replace("$", "").replace(",", ""))
-        count = int(item.get("count", 0))
+        result = defaultdict(lambda: {"price": 0, "count": 0})
+        total = 0
 
-        money = price * count
+        for item in data.get("data", []):
+            game = item.get("gameName", "Unknown")
 
-        result[game]["price"] += money
-        result[game]["count"] += count
-        total += money
+            try:
+                price = float(str(item.get("price", "0")).replace("$", "").replace(",", ""))
+                count = int(item.get("count", 0))
+            except:
+                price = 0
+                count = 0
 
-    return result, total, data.get("data", [])
+            money = price * count
+
+            result[game]["price"] += money
+            result[game]["count"] += count
+            total += money
+
+        return result, total, data.get("data", [])
+
+    except Exception as e:
+        print("FETCH ERROR:", e)
+        return {}, 0, []
 
 # ===== SAVE =====
 def save_today(items, total, date):
-    today_file = os.path.join(DATA_FOLDER, f"{date}.json")
-    with open(today_file, "w", encoding="utf-8") as f:
-        json.dump({
-            "items": items,
-            "total": total
-        }, f, ensure_ascii=False, indent=2)
+    try:
+        today_file = os.path.join(DATA_FOLDER, f"{date}.json")
+        with open(today_file, "w", encoding="utf-8") as f:
+            json.dump({
+                "items": items,
+                "total": total
+            }, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print("SAVE ERROR:", e)
 
 # ===== HISTORY =====
 def load_history():
     history = {}
-    for file in os.listdir(DATA_FOLDER):
-        if file.endswith(".json"):
-            path = os.path.join(DATA_FOLDER, file)
-            with open(path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                history[file.replace(".json","")] = data.get("total", 0)
+    try:
+        for file in os.listdir(DATA_FOLDER):
+            if file.endswith(".json"):
+                path = os.path.join(DATA_FOLDER, file)
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    history[file.replace(".json","")] = data.get("total", 0)
+    except Exception as e:
+        print("HISTORY ERROR:", e)
+
     return dict(sorted(history.items()))
 
 # ===== ROUTE =====
