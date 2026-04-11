@@ -12,7 +12,7 @@ URL = "https://boeingvip.xyz/gambler/user/child/statistic"
 def get_vn_time():
     return datetime.utcnow() + timedelta(hours=7)
 
-# ===== FETCH DATA (SIÊU AN TOÀN) =====
+# ===== FETCH DATA =====
 def fetch_data(start_vn, end_vn):
     result = defaultdict(lambda: {"price": 0, "count": 0})
     total = 0
@@ -32,14 +32,11 @@ def fetch_data(start_vn, end_vn):
         }
 
         headers = {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
             "User-Agent": "Mozilla/5.0"
         }
 
         r = requests.post(URL, json=payload, headers=headers, timeout=10)
 
-        # nếu API lỗi → không crash
         if r.status_code != 200:
             print("API lỗi:", r.text)
             return result, total
@@ -47,7 +44,7 @@ def fetch_data(start_vn, end_vn):
         try:
             data = r.json()
         except:
-            print("API trả không phải JSON")
+            print("JSON lỗi")
             return result, total
 
         for item in data.get("data", []):
@@ -62,13 +59,11 @@ def fetch_data(start_vn, end_vn):
                 result[game]["price"] += money
                 result[game]["count"] += count
                 total += money
-
-            except Exception as e:
-                print("Lỗi item:", e)
+            except:
                 continue
 
     except Exception as e:
-        print("Lỗi fetch:", e)
+        print("FETCH ERROR:", e)
 
     return result, total
 
@@ -76,35 +71,19 @@ def fetch_data(start_vn, end_vn):
 # ===== ROUTE =====
 @app.route("/")
 def index():
-    try:
-        date_str = request.args.get("date")
-        mode = request.args.get("mode", "day")
+    now = get_vn_time()
 
-        now = get_vn_time()
+    start_vn = datetime(now.year, now.month, now.day)
+    end_vn = start_vn + timedelta(days=1)
 
-        if date_str:
-            selected = datetime.strptime(date_str, "%Y-%m-%d")
-        else:
-            selected = now
+    result, total = fetch_data(start_vn, end_vn)
 
-        start_vn = datetime(selected.year, selected.month, selected.day)
-        end_vn = start_vn + timedelta(days=1)
-
-        result, total = fetch_data(start_vn, end_vn)
-
-        return render_template(
-            "index.html",
-            result=result,
-            total=total,
-            selected_date=start_vn.strftime("%Y-%m-%d"),
-            mode=mode
-        )
-
-    except Exception as e:
-        print("Lỗi route:", e)
-        return "Server đang lỗi, check log", 500
+    return render_template(
+        "index.html",
+        result=result,
+        total=total
+    )
 
 
-# ===== RUN =====
 if __name__ == "__main__":
     app.run(debug=True)
