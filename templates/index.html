@@ -32,6 +32,30 @@ h1 {
     margin-bottom: 20px;
 }
 
+/* FILTER */
+.filter {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.filter input, .filter select {
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    margin-right: 5px;
+}
+
+.filter button {
+    background: #38bdf8;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* CARD */
 .card {
     background: rgba(15,23,42,0.7);
     border: 1px solid rgba(56,189,248,0.3);
@@ -42,7 +66,7 @@ h1 {
 .row {
     display: flex;
     justify-content: space-between;
-    padding: 12px 15px;
+    padding: 14px 16px;
 }
 
 .row:hover {
@@ -51,6 +75,11 @@ h1 {
 
 .price {
     color: #22c55e;
+    font-weight: bold;
+}
+
+.header {
+    cursor: pointer;
     font-weight: bold;
 }
 </style>
@@ -64,29 +93,51 @@ h1 {
     <h1>💰 MONEY</h1>
     <div class="money">${{ "%.2f"|format(total or 0) }}</div>
 
+    <!-- FILTER -->
+    <div class="filter">
+        <form method="get">
+            <input type="date" name="date" value="{{ selected_date }}">
+            
+            <select name="mode">
+                <option value="day" {% if mode=='day' %}selected{% endif %}>Theo ngày</option>
+                <option value="month" {% if mode=='month' %}selected{% endif %}>Theo tháng</option>
+            </select>
+
+            <button type="submit">Xem</button>
+        </form>
+    </div>
+
     <!-- GAME -->
     <div class="card">
 
-        <!-- HEADER -->
-        <div class="row">
-            <div><b>🎮 Game A</b></div>
+        <!-- HEADER (CLICK) -->
+        <div class="row header" onclick="toggleGame()">
+            <div>🎮 Game A</div>
             <div class="price">${{ "%.2f"|format(total or 0) }}</div>
         </div>
 
-        <!-- LIST -->
-        {% for game, d in result.items() %}
-        <div class="row">
-            <div>{{ game }}</div>
-            <div class="price">${{ "%.2f"|format(d["price"]) }}</div>
+        <!-- LIST GAME -->
+        <div id="gameList" style="display:none;">
+            {% for game, d in result.items() %}
+            <div class="row" style="border-top:1px solid rgba(255,255,255,0.05);">
+                <div>{{ game }}</div>
+                <div class="price">${{ "%.2f"|format(d["price"]) }}</div>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
 
     </div>
 
 </div>
 
-<!-- AUTO RELOAD -->
+<!-- JS -->
 <script>
+function toggleGame() {
+    const el = document.getElementById("gameList");
+    el.style.display = (el.style.display === "none") ? "block" : "none";
+}
+
+// auto reload
 setInterval(() => {
     window.location.reload();
 }, 10000);
