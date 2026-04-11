@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Money App</title>
+<title>Money Dashboard</title>
 
 <style>
 body {
@@ -19,17 +19,10 @@ body {
     padding: 25px 15px;
 }
 
-.title {
-    font-size: 26px;
-    color: #38bdf8;
-    font-weight: 600;
-}
-
 .money {
     font-size: 48px;
     color: #22c55e;
-    margin: 12px 0;
-    font-weight: 700;
+    font-weight: bold;
 }
 
 /* DATE */
@@ -41,19 +34,16 @@ body {
 }
 
 .date-box input,
-.date-box select,
 .date-box button {
     padding: 14px 18px;
     font-size: 18px;
     border-radius: 12px;
     border: none;
-    background: #0f172a;
-    color: white;
 }
 
 .date-box button {
     background: #38bdf8;
-    font-weight: bold;
+    color: white;
 }
 
 /* CONTAINER */
@@ -108,52 +98,29 @@ body {
 <body>
 
 <div class="header">
-    <div class="title">💰 MONEY</div>
-    <div class="money">$0.00</div>
+    <div class="money" id="totalMoney">$0.00</div>
 
     <div class="date-box">
         <input type="date">
-        <select>
-            <option>Theo ngày</option>
-            <option>Theo tuần</option>
-        </select>
         <button onclick="reloadPage()">Xem</button>
     </div>
 </div>
 
 <div class="container">
 
-    <!-- GROUP -->
     <div class="group">
         <div class="group-header" onclick="toggle(this)">
-            <div>🎮 Game A</div>
-            <div class="total">$0.00</div>
+            <div>🎮 Tổng Game</div>
+            <div class="total" id="groupTotal">$0.00</div>
         </div>
 
-        <div class="detail">
-            <div class="item">
-                <div>Demon Flying</div>
-                <div>$1.07</div>
-            </div>
-            <div class="item">
-                <div>Note App</div>
-                <div>$1.00</div>
-            </div>
-            <div class="item">
-                <div>Elf Land Adventure</div>
-                <div>$4.31</div>
-            </div>
-            <div class="item">
-                <div>Magical Adventure</div>
-                <div>$4.27</div>
-            </div>
-        </div>
+        <div class="detail" id="gameList"></div>
     </div>
 
 </div>
 
 <script>
-// accordion chỉ mở 1 cái
+// chỉ mở 1 accordion
 function toggle(el) {
     const all = document.querySelectorAll(".group");
 
@@ -166,27 +133,27 @@ function toggle(el) {
     el.parentElement.classList.toggle("active");
 }
 
-// tính tổng tiền
-function updateTotal() {
+// load data realtime
+async function loadData() {
+    const res = await fetch("/api/data");
+    const data = await res.json();
+
+    let html = "";
     let total = 0;
 
-    document.querySelectorAll(".item div:last-child").forEach(el => {
-        let value = parseFloat(el.innerText.replace("$", ""));
-        total += value;
+    data.forEach(g => {
+        total += g.money;
+
+        html += `
+        <div class="item">
+            <div>${g.name}</div>
+            <div>$${g.money.toFixed(2)}</div>
+        </div>`;
     });
 
-    document.querySelector(".money").innerText = "$" + total.toFixed(2);
-
-    document.querySelectorAll(".group").forEach(group => {
-        let groupTotal = 0;
-
-        group.querySelectorAll(".item div:last-child").forEach(el => {
-            let value = parseFloat(el.innerText.replace("$", ""));
-            groupTotal += value;
-        });
-
-        group.querySelector(".total").innerText = "$" + groupTotal.toFixed(2);
-    });
+    document.getElementById("gameList").innerHTML = html;
+    document.getElementById("totalMoney").innerText = "$" + total.toFixed(2);
+    document.getElementById("groupTotal").innerText = "$" + total.toFixed(2);
 }
 
 // reload
@@ -194,8 +161,9 @@ function reloadPage() {
     location.reload();
 }
 
-// chạy khi load
-updateTotal();
+// chạy lần đầu + realtime mỗi 3s
+loadData();
+setInterval(loadData, 3000);
 </script>
 
 </body>
