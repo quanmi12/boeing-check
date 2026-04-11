@@ -16,34 +16,24 @@ URL = "https://boeingvip.xyz/gambler/user/child/statistic"
 def get_vn_time():
     return datetime.utcnow() + timedelta(hours=7)
 
-# ===== FETCH DATA (FIX FULL) =====
+# ===== FETCH DATA (FIX LỖI 500) =====
 def fetch_data(start_vn, end_vn):
     try:
         start_utc = start_vn - timedelta(hours=7)
         end_utc = end_vn - timedelta(hours=7)
 
         payload = {
-            "shopId": None,
-            "packageName": "",
             "assigned": USER,
-            "productId": "",
-            "action": "import_token",
             "startDate": start_utc.isoformat() + "Z",
             "endDate": end_utc.isoformat() + "Z"
         }
 
         headers = {
-            "Accept": "application/json, text/plain, */*",
-            "Content-Type": "application/json",
-            "Origin": "https://boeingvip.xyz",
-            "Referer": f"https://boeingvip.xyz/thong-ke-nap?user={USER}",
-            "User-Agent": "Mozilla/5.0",
-            "X-Requested-With": "XMLHttpRequest"
+            "User-Agent": "Mozilla/5.0"
         }
 
         r = requests.post(URL, json=payload, headers=headers, timeout=10)
 
-        # debug nếu lỗi
         if r.status_code != 200:
             print("API ERROR:", r.text)
             return {}, 0
@@ -77,35 +67,17 @@ def fetch_data(start_vn, end_vn):
 # ===== ROUTE =====
 @app.route("/")
 def index():
-    date_str = request.args.get("date")
-    mode = request.args.get("mode", "day")
-
     now = get_vn_time()
 
-    if mode == "month":
-        start_vn = datetime(now.year, now.month, 1)
-        end_vn = start_vn + timedelta(days=32)
-        end_vn = datetime(end_vn.year, end_vn.month, 1)
-        selected_date = now.strftime("%Y-%m")
-
-    else:
-        if date_str:
-            selected = datetime.strptime(date_str, "%Y-%m-%d")
-        else:
-            selected = now
-
-        start_vn = datetime(selected.year, selected.month, selected.day)
-        end_vn = start_vn + timedelta(days=1)
-        selected_date = start_vn.strftime("%Y-%m-%d")
+    start_vn = datetime(now.year, now.month, now.day)
+    end_vn = start_vn + timedelta(days=1)
 
     result, total = fetch_data(start_vn, end_vn)
 
     return render_template(
         "index.html",
         result=result,
-        total=total,
-        selected_date=selected_date,
-        mode=mode
+        total=total
     )
 
 if __name__ == "__main__":
