@@ -2,122 +2,127 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>MEO MEO</title>
+<title>MEO MEO PRO</title>
 
-<!-- FLATPICKR -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <style>
 body {
     margin: 0;
-    background: radial-gradient(circle at top, #020617, #000);
+    background: radial-gradient(circle,#020617,#000);
     color: #e2e8f0;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI';
 }
 
+/* ===== CONTAINER ===== */
 .container {
     max-width: 900px;
     margin: auto;
-    padding: 20px;
+    padding: 15px;
 }
 
-/* FILTER */
-form {
+/* ===== FILTER ===== */
+.filter {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    justify-content: center;
     margin-bottom: 15px;
 }
 
-input {
-    padding: 12px;
-    border-radius: 10px;
+.filter input {
+    flex: 1;
+    min-width: 120px;
+    padding: 14px;
+    border-radius: 12px;
     border: none;
+    font-size: 16px;
 }
 
-button {
-    background: #22c55e;
+.filter button {
+    padding: 14px 18px;
+    border-radius: 12px;
     border: none;
-    padding: 12px 16px;
-    border-radius: 50px;
+    background: #22c55e;
+    font-weight: bold;
     cursor: pointer;
 }
 
-button:hover {
-    box-shadow: 0 0 12px #22c55e;
-}
-
-/* BOX */
+/* ===== BOX ===== */
 .box {
-    background: rgba(15,23,42,0.85);
+    background: #0f172a;
     border-radius: 16px;
     padding: 20px;
-    border: 1px solid rgba(34,197,94,0.3);
+    border: 1px solid #00f0ff44;
+    box-shadow: 0 0 20px #00f0ff33;
 }
 
-/* HEADER */
 .header {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
 }
 
-/* NAME */
-.name {
-    font-size: 32px;
-    color: #38bdf8;
+/* ===== TEXT ===== */
+.title {
+    font-size: 28px;
 }
 
-/* MONEY */
 .money {
     font-size: 32px;
-    color: #22c55e;
-    font-weight: bold;
-    position: relative;
-}
-
-/* + MONEY EFFECT */
-.plus-money {
-    position: absolute;
-    right: 0;
-    color: #22c55e;
-    font-size: 16px;
-    animation: flyUp 1s ease-out;
-}
-
-@keyframes flyUp {
-    0% { transform: translateY(10px); opacity: 0; }
-    50% { opacity: 1; }
-    100% { transform: translateY(-25px); opacity: 0; }
-}
-
-/* GAME */
-.game-main span {
-    color: #22c55e;
+    color: #00ff88;
     font-weight: bold;
 }
 
-/* DETAIL */
-.detail {
-    display: none;
-    margin-top: 15px;
-}
-
+/* ===== DETAIL ===== */
 .item {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    padding-bottom: 5px;
+    margin-top: 8px;
 }
 
-/* MOBILE */
+/* ===== BUTTON ===== */
+button {
+    background: #22c55e;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* ===== MINI BUTTON ===== */
+.mini-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: gold;
+    border-radius: 50%;
+    padding: 15px;
+    font-size: 20px;
+}
+
+/* ===== POPUP ===== */
+.popup {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+}
+
+.popup-box {
+    background: #111;
+    margin: 40px auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 350px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+/* ===== MOBILE ===== */
 @media (max-width: 600px) {
-    .header {
-        flex-direction: column;
-    }
+    .title { font-size: 22px; }
+    .money { font-size: 24px; }
 }
 </style>
 </head>
@@ -126,107 +131,140 @@ button:hover {
 
 <div class="container">
 
-    <!-- FILTER -->
-    <form method="get">
-        <input type="date" name="start_date" value="{{ start_date }}">
-        <input id="start_time" name="start_time" value="{{ start_time }}">
-        
-        <input type="date" name="end_date" value="{{ end_date }}">
-        <input id="end_time" name="end_time" value="{{ end_time }}">
+<!-- FILTER -->
+<form method="get" class="filter">
+    <input type="date" name="start_date" value="{{ start_date }}">
+    <input id="start_time" name="start_time" value="{{ start_time }}">
+    <input type="date" name="end_date" value="{{ end_date }}">
+    <input id="end_time" name="end_time" value="{{ end_time }}">
+    <button>🔄 Làm mới</button>
+</form>
 
-        <button type="submit">🔄 Làm mới</button>
-    </form>
+<!-- BOX -->
+<div class="box">
 
-    <!-- BOX -->
-    <div class="box">
+<div class="header">
+<div>
+<div class="title">👑 Bảng Phong Thần</div>
 
-        <div class="header">
+{% if result %}
+{% set first = result.keys()|list|first %}
+<div>{{ first }}</div>
+<div style="color:#ef4444;">
+${{ "%.2f"|format(result[first]["price"]) }}
+</div>
+{% endif %}
 
-            <div>
-                <div class="name">👑 Bảng Phong Thần</div>
+<button onclick="toggleDetail()">📊 Chi tiết</button>
+</div>
 
-                {% if result %}
-                {% set first_game = result.keys()|list|first %}
-                <div class="game-main">
-                    🎮 {{ first_game }}<br>
-                    <span>💰 ${{ "%.2f"|format(result[first_game]["price"]) }}</span>
-                </div>
-                {% endif %}
+<div class="money">
+${{ "%.2f"|format(total or 0) }}
+</div>
+</div>
 
-                <button onclick="toggleDetail()">📊 Xem chi tiết</button>
-            </div>
-
-            <!-- MONEY -->
-            <div class="money">
-                <span id="money"></span>
-                <div id="plusBox"></div>
-            </div>
-
-        </div>
-
-        <!-- DETAIL -->
-        <div class="detail" id="detailBox">
-            {% for game, d in result.items() %}
-            <div class="item">
-                <div>🎮 {{ game }}</div>
-                <div>💰 ${{ "%.2f"|format(d["price"]) }}</div>
-            </div>
-            {% endfor %}
-        </div>
-
-    </div>
+<div id="detailBox" style="display:none;">
+{% for game, d in result.items() %}
+<div class="item">
+<div>{{ game }}</div>
+<div>${{ "%.2f"|format(d["price"]) }}</div>
+</div>
+{% endfor %}
+</div>
 
 </div>
 
+</div>
+
+<!-- MINI BUTTON -->
+<div class="mini-btn" onclick="openMini()">🎮</div>
+
+<!-- MINI GAME -->
+<div class="popup" id="mini">
+<div class="popup-box">
+<h2>💰 Mini: <span id="miniMoney">10000</span></h2>
+
+<button onclick="openTX()">🎲 Tài Xỉu</button>
+<button onclick="closeMini()">Đóng</button>
+</div>
+</div>
+
+<!-- TÀI XỈU -->
+<div class="popup" id="tx">
+<div class="popup-box">
+
+<h3>🎲 Tài Xỉu</h3>
+
+<div id="dice">🎲 🎲 🎲</div>
+
+<button onclick="setChoice('tai')">Tài</button>
+<button onclick="setChoice('xiu')">Xỉu</button>
+
+<input id="betInput" value="1000" style="padding:10px; width:80%;">
+
+<button onclick="playTX()">Cược</button>
+
+<div id="txResult"></div>
+
+<button onclick="closeTX()">Đóng</button>
+
+</div>
+</div>
+
 <script>
-// TIME PICKER 24H
-flatpickr("#start_time", {
-    enableTime: true,
-    noCalendar: true,
-    dateFormat: "H:i:S",
-    time_24hr: true
-});
+flatpickr("#start_time",{enableTime:true,noCalendar:true,dateFormat:"H:i:S",time_24hr:true});
+flatpickr("#end_time",{enableTime:true,noCalendar:true,dateFormat:"H:i:S",time_24hr:true});
 
-flatpickr("#end_time", {
-    enableTime: true,
-    noCalendar: true,
-    dateFormat: "H:i:S",
-    time_24hr: true
-});
-
-// TOGGLE
-function toggleDetail() {
-    let box = document.getElementById("detailBox");
-    box.style.display = box.style.display === "none" ? "block" : "none";
+/* ===== DETAIL ===== */
+function toggleDetail(){
+let d=document.getElementById("detailBox");
+d.style.display=d.style.display=="none"?"block":"none";
 }
 
-// ===== MONEY UPDATE (KHÔNG CHẠY) =====
-let target = {{ total or 0 }};
-let moneyEl = document.getElementById("money");
-let plusBox = document.getElementById("plusBox");
+/* ===== MINI ===== */
+let money = localStorage.getItem("money") || 10000;
+document.getElementById("miniMoney").innerText = money;
 
-// hiển thị tiền ngay
-moneyEl.innerText = "$" + target.toFixed(2);
-
-// lấy tiền cũ
-let old = localStorage.getItem("old_money");
-
-if (old !== null) {
-    old = parseFloat(old);
-    let diff = target - old;
-
-    if (diff > 0) {
-        let plus = document.createElement("div");
-        plus.className = "plus-money";
-        plus.innerText = "(+" + diff.toFixed(2) + ")";
-        plusBox.appendChild(plus);
-
-        setTimeout(() => plus.remove(), 1200);
-    }
+function save(){
+localStorage.setItem("money", money);
 }
 
-// lưu lại
-localStorage.setItem("old_money", target);
+function openMini(){mini.style.display="block";}
+function closeMini(){mini.style.display="none";}
+
+/* ===== TÀI XỈU ===== */
+let choice="tai";
+
+function setChoice(c){choice=c;}
+
+function openTX(){tx.style.display="block";}
+function closeTX(){tx.style.display="none";}
+
+function playTX(){
+
+let betValue = parseInt(document.getElementById("betInput").value);
+
+let d1=Math.floor(Math.random()*6+1);
+let d2=Math.floor(Math.random()*6+1);
+let d3=Math.floor(Math.random()*6+1);
+
+dice.innerText=`${d1} ${d2} ${d3}`;
+
+let sum=d1+d2+d3;
+let res=sum>=11?"tai":"xiu";
+
+if(res==choice){
+money = parseInt(money) + betValue;
+txResult.innerText="WIN 🎉 +" + betValue;
+}else{
+money = parseInt(money) - betValue;
+txResult.innerText="LOSE 💀 -" + betValue;
+}
+
+miniMoney.innerText=money;
+save();
+
+}
 </script>
 
 </body>
