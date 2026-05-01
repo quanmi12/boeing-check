@@ -5,8 +5,9 @@ from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
-URL = "https://sdtvip1.xyz/gambler/user/child/statistic"
-USER = "sdt21"
+# ✅ API MỚI
+URL = "https://boeingvip.xyz/gambler/user/child/statistic"
+USER = "hung2"
 
 def fetch_data(start_date, end_date, start_time, end_time):
 
@@ -18,7 +19,7 @@ def fetch_data(start_date, end_date, start_time, end_time):
     start_utc = start_local - timedelta(hours=7)
     end_utc = end_local - timedelta(hours=7)
 
-    # 🔥 FIX CHUẨN MILLISECOND (QUAN TRỌNG)
+    # ===== FORMAT CHUẨN API =====
     start_utc_str = start_utc.strftime("%Y-%m-%dT%H:%M:%S.000Z")
     end_utc_str = end_utc.strftime("%Y-%m-%dT%H:%M:%S.999Z")
 
@@ -35,8 +36,8 @@ def fetch_data(start_date, end_date, start_time, end_time):
     headers = {
         "Accept": "application/json, text/plain, */*",
         "Content-Type": "application/json",
-        "Origin": "https://sdtvip1.xyz",
-        "Referer": f"https://sdtvip1.xyz/thong-ke-nap?user={USER}",
+        "Origin": "https://boeingvip.xyz",
+        "Referer": f"https://boeingvip.xyz/thong-ke-nap?user={USER}",
         "User-Agent": "Mozilla/5.0",
         "X-Requested-With": "XMLHttpRequest"
     }
@@ -62,14 +63,12 @@ def fetch_data(start_date, end_date, start_time, end_time):
             price = 0
             count = 0
 
-        # ✅ LOGIC ĐÚNG THEO API
         money = price * count
 
         result[game]["price"] += money
         result[game]["count"] += count
         total += money
 
-    # sort giảm dần
     result = dict(sorted(result.items(), key=lambda x: x[1]["price"], reverse=True))
 
     return result, total
