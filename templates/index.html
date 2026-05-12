@@ -2,22 +2,28 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MEO MEO</title>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <style>
+
+*{
+    box-sizing:border-box;
+}
+
 body{
     margin:0;
     background:#020617;
     color:#e2e8f0;
-    font-family:'Segoe UI';
+    font-family:'Segoe UI',sans-serif;
 }
 
 /* ===== CONTAINER ===== */
 .container{
-    max-width:1000px;
+    max-width:1200px;
     margin:auto;
     padding:15px;
 }
@@ -27,79 +33,172 @@ form{
     display:flex;
     flex-wrap:wrap;
     gap:10px;
-    margin-bottom:15px;
+    margin-bottom:18px;
 }
 
-input{
-    padding:14px;
-    font-size:16px;
-    border-radius:12px;
-    border:none;
+form input{
     flex:1;
+    min-width:150px;
+    padding:14px;
+    border:none;
+    border-radius:14px;
+    background:#f8fafc;
+    font-size:17px;
+    font-weight:600;
+    color:#111827;
 }
 
-button{
-    padding:12px 18px;
+form button{
     border:none;
-    border-radius:10px;
     background:#22c55e;
-    color:#000;
+    color:white;
+    padding:14px 22px;
+    border-radius:14px;
     cursor:pointer;
+    font-size:16px;
+    font-weight:700;
+    transition:.2s;
+}
+
+form button:hover{
+    transform:scale(1.03);
+    background:#16a34a;
 }
 
 /* ===== BOX ===== */
 .box{
-    background:#0f172a;
-    border-radius:16px;
-    padding:20px;
-    border:1px solid #00f0ff44;
-    box-shadow:0 0 20px #00f0ff33;
+    background:#07152d;
+    border-radius:20px;
+    padding:28px;
+    margin-bottom:24px;
+
+    border:1px solid rgba(0,255,255,0.25);
+
+    box-shadow:
+    0 0 18px rgba(0,255,255,0.08),
+    inset 0 0 25px rgba(0,255,255,0.03);
+}
+
+/* ===== TOP ===== */
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+/* ===== TITLE ===== */
+.title{
+    font-size:32px;
+    font-weight:800;
+    color:#f8fafc;
+    margin-bottom:18px;
+}
+
+/* ===== GAME ===== */
+.first-game{
+    font-size:18px;
+    color:#ffffff;
+    margin-bottom:8px;
+}
+
+.first-price{
+    color:#ff4d67;
+    font-size:30px;
+    font-weight:800;
 }
 
 /* ===== MONEY ===== */
 .money{
-    font-size:34px;
+    font-size:56px;
+    font-weight:900;
     color:#00ff88;
-    font-weight:bold;
+
+    text-shadow:
+    0 0 8px rgba(0,255,136,0.35);
 }
 
-/* ===== MINI BTN ===== */
-.mini-btn{
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    background:gold;
-    border-radius:50%;
-    padding:16px;
-    font-size:20px;
+/* ===== BUTTON ===== */
+.btn{
+    margin-top:20px;
+    border:none;
+    background:#22c55e;
+    color:white;
+    padding:12px 18px;
+    border-radius:14px;
     cursor:pointer;
-    z-index:9999;
+    font-size:15px;
+    font-weight:700;
+    transition:.2s;
 }
 
-/* ===== POPUP ===== */
-.popup{
+.btn:hover{
+    background:#16a34a;
+    transform:translateY(-2px);
+}
+
+/* ===== DETAIL ===== */
+.detail{
     display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.85);
-    z-index:9998;
+    margin-top:24px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding-top:16px;
 }
 
-.popup-box{
-    background:#111;
-    margin:60px auto;
-    padding:20px;
-    width:90%;
-    max-width:400px;
-    border-radius:12px;
-    text-align:center;
+.item{
+    display:flex;
+    justify-content:space-between;
+    padding:12px 0;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    font-size:16px;
 }
 
 /* ===== MOBILE ===== */
-@media(max-width:600px){
-    .money{font-size:26px;}
-    h1{font-size:22px;}
+@media(max-width:700px){
+
+    .container{
+        padding:10px;
+    }
+
+    form{
+        gap:8px;
+    }
+
+    form input{
+        min-width:unset;
+        width:calc(50% - 4px);
+        font-size:15px;
+        padding:13px;
+    }
+
+    form button{
+        width:100%;
+        padding:14px;
+    }
+
+    .box{
+        padding:20px;
+    }
+
+    .title{
+        font-size:24px;
+    }
+
+    .money{
+        font-size:38px;
+    }
+
+    .first-game{
+        font-size:16px;
+    }
+
+    .first-price{
+        font-size:24px;
+    }
+
 }
+
 </style>
 </head>
 
@@ -107,196 +206,157 @@ button{
 
 <div class="container">
 
+<!-- FILTER -->
 <form method="get">
+
 <input type="date" name="start_date" value="{{ start_date }}">
 <input id="start_time" name="start_time" value="{{ start_time }}">
+
 <input type="date" name="end_date" value="{{ end_date }}">
 <input id="end_time" name="end_time" value="{{ end_time }}">
-<button>🔄 Làm mới</button>
+
+<button type="submit">🔄 Làm mới</button>
+
 </form>
 
+<!-- ======================= -->
+<!-- VÍ 1 -->
+<!-- ======================= -->
+
 <div class="box">
-<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+
+<div class="top">
 
 <div>
-<h1>👑 Bảng Phong Thần</h1>
+
+<div class="title">
+👑 Phép Thuật Win
+</div>
 
 {% if result %}
 {% set first = result.keys()|list|first %}
-<div>{{ first }}</div>
-<div style="color:#ef4444;">
+
+<div class="first-game">
+{{ first }}
+</div>
+
+<div class="first-price">
 ${{ "%.2f"|format(result[first]["price"]) }}
 </div>
+
 {% endif %}
 
-<button onclick="toggleDetail()">📊 Xem chi tiết</button>
+<button class="btn" onclick="toggleDetail('detail1')">
+📊 Xem chi tiết
+</button>
+
 </div>
 
-<div>
 <div class="money">
 ${{ "%.2f"|format(total or 0) }}
 </div>
-</div>
 
 </div>
 
-<div id="detailBox" style="display:none;margin-top:15px;">
+<div class="detail" id="detail1">
+
 {% for game, d in result.items() %}
-<div style="display:flex;justify-content:space-between;">
+
+<div class="item">
 <div>{{ game }}</div>
 <div>${{ "%.2f"|format(d["price"]) }}</div>
 </div>
+
 {% endfor %}
+
+</div>
+
+</div>
+
+<!-- ======================= -->
+<!-- VÍ 2 -->
+<!-- ======================= -->
+
+<div class="box">
+
+<div class="top">
+
+<div>
+
+<div class="title">
+👑 Enchatit
+</div>
+
+{% if result2 %}
+{% set first2 = result2.keys()|list|first %}
+
+<div class="first-game">
+{{ first2 }}
+</div>
+
+<div class="first-price">
+${{ "%.2f"|format(result2[first2]["price"]) }}
+</div>
+
+{% endif %}
+
+<button class="btn" onclick="toggleDetail('detail2')">
+📊 Xem chi tiết
+</button>
+
+</div>
+
+<div class="money">
+${{ "%.2f"|format(total2 or 0) }}
 </div>
 
 </div>
+
+<div class="detail" id="detail2">
+
+{% for game, d in result2.items() %}
+
+<div class="item">
+<div>{{ game }}</div>
+<div>${{ "%.2f"|format(d["price"]) }}</div>
 </div>
 
-<!-- MINI BUTTON -->
-<div class="mini-btn" onclick="openMini()">🎮</div>
+{% endfor %}
 
-<!-- MINI GAME -->
-<div class="popup" id="mini">
-<div class="popup-box">
-<h2>💰 Mini Game: <span id="miniMoney">10000</span></h2>
-
-<button onclick="openTaiXiu()">🎲 Tài Xỉu</button>
-<button onclick="openPoker()">🃏 Poker</button>
-
-<br><br>
-<button onclick="closeMini()">Đóng</button>
-</div>
 </div>
 
-<!-- TÀI XỈU -->
-<div class="popup" id="taixiu">
-<div class="popup-box">
-<h3>🎲 Tài Xỉu</h3>
-
-<button onclick="choose('tai')">TÀI</button>
-<button onclick="choose('xiu')">XỈU</button>
-
-<br><br>
-
-<input id="bet" value="1000">
-
-<br><br>
-
-<button onclick="playTX()">Đặt cược</button>
-
-<div id="resultTX" style="margin-top:10px;"></div>
-
-<br>
-<button onclick="closeTX()">Đóng</button>
-</div>
 </div>
 
-<!-- POKER -->
-<div class="popup" id="poker">
-<div class="popup-box">
-<h3>🃏 Poker</h3>
-
-<div id="cards" style="margin:15px;font-size:20px;">???</div>
-
-<button onclick="spinPoker()">Quay</button>
-<br><br>
-<button onclick="closePoker()">Đóng</button>
-</div>
 </div>
 
 <script>
-flatpickr("#start_time",{enableTime:true,noCalendar:true,dateFormat:"H:i:S",time_24hr:true});
-flatpickr("#end_time",{enableTime:true,noCalendar:true,dateFormat:"H:i:S",time_24hr:true});
 
-/* ===== DETAIL ===== */
-function toggleDetail(){
-let d=document.getElementById("detailBox");
-d.style.display=d.style.display=="none"?"block":"none";
+flatpickr("#start_time",{
+    enableTime:true,
+    noCalendar:true,
+    dateFormat:"H:i:S",
+    time_24hr:true
+});
+
+flatpickr("#end_time",{
+    enableTime:true,
+    noCalendar:true,
+    dateFormat:"H:i:S",
+    time_24hr:true
+});
+
+function toggleDetail(id){
+
+    let box = document.getElementById(id);
+
+    if(box.style.display == "block"){
+        box.style.display = "none";
+    }else{
+        box.style.display = "block";
+    }
+
 }
 
-/* ===== MINI GAME RESET mỗi reload ===== */
-let money = 10000;
-let choice = "tai";
-
-function updateMoney(){
-document.getElementById("miniMoney").innerText = money;
-}
-
-/* ===== MINI ===== */
-function openMini(){
-document.getElementById("mini").style.display="block";
-updateMoney();
-}
-function closeMini(){
-document.getElementById("mini").style.display="none";
-}
-
-/* ===== TÀI XỈU ===== */
-function openTaiXiu(){
-document.getElementById("taixiu").style.display="block";
-}
-function closeTX(){
-document.getElementById("taixiu").style.display="none";
-}
-
-function choose(c){
-choice = c;
-}
-
-function playTX(){
-let bet = parseInt(document.getElementById("bet").value);
-
-if(bet > money){
-alert("Không đủ tiền!");
-return;
-}
-
-let dice =
-Math.floor(Math.random()*6+1)+
-Math.floor(Math.random()*6+1)+
-Math.floor(Math.random()*6+1);
-
-let res = (dice >= 11) ? "tai" : "xiu";
-
-if(res == choice){
-money += bet;
-}else{
-money -= bet;
-}
-
-updateMoney();
-
-document.getElementById("resultTX").innerText =
-"Kết quả: "+dice+" ("+res+")";
-}
-
-/* ===== POKER ===== */
-function openPoker(){
-document.getElementById("poker").style.display="block";
-}
-function closePoker(){
-document.getElementById("poker").style.display="none";
-}
-
-function spinPoker(){
-let cards=["A","K","Q","J","10","9","8"];
-let result="";
-
-for(let i=0;i<5;i++){
-result+=cards[Math.floor(Math.random()*cards.length)]+" ";
-}
-
-document.getElementById("cards").innerText=result;
-
-/* random thắng thua */
-if(Math.random() > 0.5){
-money += 500;
-}else{
-money -= 500;
-}
-
-updateMoney();
-}
 </script>
 
 </body>
